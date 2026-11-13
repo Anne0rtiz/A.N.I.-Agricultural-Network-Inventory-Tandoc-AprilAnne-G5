@@ -1,0 +1,57 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block panel %}
+<h1>Cooperative Admin Dashboard</h1>
+<p class="muted">Hello, {{ user.display_name }}.
+  {% if cooperative %}You are managing <strong>{{ cooperative.name }}</strong>.{% endif %}</p>
+
+{% if cooperative %}
+<div class="stats">
+  <div class="stat"><span class="stat-label">Registered farmers</span><span class="stat-value">{{ farmer_count }}</span></div>
+  <div class="stat">
+    <span class="stat-label">Farmer join code</span>
+    <span class="stat-value code" id="join-code">{{ cooperative.join_code }}</span>
+    <button type="button" class="btn btn-ghost btn-sm" id="copy-code">Copy</button>
+  </div>
+  <div class="stat"><span class="stat-label">Location</span><span class="stat-value small">{{ cooperative.location|default:"Not set" }}</span></div>
+</div>
+
+<div class="card">
+  <h3>Recently joined farmers</h3>
+  {% if recent_farmers %}
+    <table class="table">
+      <thead><tr><th>Farmer ID</th><th>Name</th><th>Contact</th><th>Joined</th></tr></thead>
+      <tbody>
+        {% for f in recent_farmers %}
+          <tr><td>{{ f.farmer_code }}</td><td>{{ f.display_name }}</td><td>{{ f.contact_number }}</td><td>{{ f.date_joined|date:"M d, Y" }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">No farmers have joined yet. Share your join code <strong>{{ cooperative.join_code }}</strong> with them.</p>
+  {% endif %}
+</div>
+{% else %}
+  <div class="alert alert-warning">Your account isn't linked to a cooperative yet.</div>
+{% endif %}
+
+<div class="grid-3">
+  <div class="card placeholder"><h3>Machinery availability</h3></div>
+  <div class="card placeholder"><h3>Recent crop deposits</h3></div>
+  <div class="card placeholder"><h3>Cooperative yields</h3></div>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('copy-code');
+    var code = document.getElementById('join-code');
+    if (!btn || !code || !navigator.clipboard) { if (btn) btn.hidden = true; return; }
+    btn.addEventListener('click', function () {
+      navigator.clipboard.writeText(code.textContent.trim()).then(function () {
+        btn.textContent = 'Copied!';
+        setTimeout(function () { btn.textContent = 'Copy'; }, 1500);
+      });
+    });
+  })();
+</script>
+{% endblock %}

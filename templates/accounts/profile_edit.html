@@ -1,0 +1,23 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}Edit Profile{% endblock %}
+{% block panel %}
+<h1>Edit Profile</h1>
+<div class="card">
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <div class="grid-2 tight">
+      {% include "accounts/_field.html" with field=form.first_name %}
+      {% include "accounts/_field.html" with field=form.last_name %}
+    </div>
+    {% include "accounts/_field.html" with field=form.email %}
+    {% include "accounts/_field.html" with field=form.contact_number %}
+    {% include "accounts/_field.html" with field=form.profile_photo %}
+    <p class="muted">Your username and role can't be changed here.</p>
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">Save changes</button>
+      <a class="btn btn-ghost" href="{% url 'accounts:profile' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

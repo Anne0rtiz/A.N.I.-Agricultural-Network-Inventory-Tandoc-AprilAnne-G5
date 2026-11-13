@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<section class="container narrow">
+  <div class="card">
+    <h1>Log in</h1>
+    <p class="muted">Welcome back. Sign in with your username or email.</p>
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+      {% include "accounts/_field.html" with field=form.username %}
+      {% include "accounts/_field.html" with field=form.password %}
+      <button type="submit" class="btn btn-primary btn-block">Log in</button>
+    </form>
+    <p class="muted center top-gap">New to A.N.I.? <a href="{% url 'accounts:register' %}">Create an account</a></p>
+  </div>
+</section>
+{% endblock %}

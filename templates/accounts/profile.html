@@ -1,0 +1,28 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}My Profile{% endblock %}
+{% block panel %}
+<div class="row-between">
+  <h1>My Profile</h1>
+  <a class="btn btn-primary" href="{% url 'accounts:profile_edit' %}">Edit profile</a>
+</div>
+
+<div class="card profile-card">
+  <div class="profile-head">
+    {% include "accounts/_avatar.html" with person=profile_user size="lg" %}
+    <div>
+      <h2>{{ profile_user.display_name }}</h2>
+      <span class="role-badge role-{{ profile_user.role }}">{{ profile_user.get_role_display }}</span>
+    </div>
+  </div>
+  <dl class="details">
+    <dt>Username</dt><dd>{{ profile_user.username }}</dd>
+    <dt>First name</dt><dd>{{ profile_user.first_name|default:"—" }}</dd>
+    <dt>Last name</dt><dd>{{ profile_user.last_name|default:"—" }}</dd>
+    <dt>Email</dt><dd>{{ profile_user.email }}</dd>
+    <dt>Contact number</dt><dd>{{ profile_user.contact_number|default:"—" }}</dd>
+    <dt>Cooperative</dt><dd>{{ profile_user.cooperative.name|default:"—" }}</dd>
+    {% if profile_user.is_farmer %}<dt>Farmer ID</dt><dd>{{ profile_user.farmer_code }}</dd>{% endif %}
+    <dt>Member since</dt><dd>{{ profile_user.date_joined|date:"F d, Y" }}</dd>
+  </dl>
+</div>
+{% endblock %}

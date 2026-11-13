@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}Welcome{% endblock %}
+{% block content %}
+<section class="hero">
+  <h1>Farm cooperatives, <span>without the paper logbook.</span></h1>
+  <p>A.N.I. helps cooperatives schedule shared machinery and consolidate every farmer's harvest into one
+     trusted digital ledger, even for farmers who don't own a smartphone.</p>
+  <div class="hero-actions">
+    <a class="btn btn-primary btn-lg" href="{% url 'accounts:register' %}">Create an account</a>
+    <a class="btn btn-ghost btn-lg" href="{% url 'accounts:login' %}">Log in</a>
+  </div>
+</section>
+<section class="container grid-2">
+  <div class="card">
+    <h3>Cooperative Admins</h3>
+    <p>Set up your cooperative, register farmers, and run the Proxy Operations Hub on their behalf.</p>
+  </div>
+  <div class="card">
+    <h3>Farmers</h3>
+    <p>Join your cooperative with its join code and follow your machinery schedules and crop contributions.</p>
+  </div>
+</section>
+{% endblock %}

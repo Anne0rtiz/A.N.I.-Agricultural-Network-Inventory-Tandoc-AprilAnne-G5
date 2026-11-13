@@ -1,0 +1,19 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}My Dashboard{% endblock %}
+{% block panel %}
+<h1>Farmer Dashboard</h1>
+<p class="muted">Hello, {{ user.display_name }}.
+  {% if cooperative %}You belong to <strong>{{ cooperative.name }}</strong>.{% endif %}</p>
+
+<div class="stats">
+  <div class="stat"><span class="stat-label">Your Farmer ID</span><span class="stat-value code">{{ user.farmer_code }}</span></div>
+  <div class="stat"><span class="stat-label">Cooperative</span><span class="stat-value small">{{ cooperative.name|default:"—" }}</span></div>
+  <div class="stat"><span class="stat-label">SMS alerts go to</span><span class="stat-value small">{{ user.contact_number|default:"Not set" }}</span></div>
+</div>
+
+<div class="grid-3">
+  <div class="card placeholder"><h3>My tractor reservations</h3></div>
+  <div class="card placeholder"><h3>My crop contributions</h3></div>
+  <div class="card placeholder"><h3>My QR ID card</h3></div>
+</div>
+{% endblock %}

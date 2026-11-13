@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="shell">
+  <aside class="sidebar">
+    <p class="role-badge role-{{ user.role }}">{{ user.get_role_display }}</p>
+    <nav class="sidenav">
+      {% if user.is_coop_admin %}
+        <a href="{% url 'accounts:admin_dashboard' %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}class="active"{% endif %}>Overview</a>
+        <span class="soon">Proxy Operations Hub</span>
+        <span class="soon">Machinery Schedule</span>
+        <span class="soon">QR Logging</span>
+        <span class="soon">Yield Ledger</span>
+        <span class="soon">SMS Alerts</span>
+      {% else %}
+        <a href="{% url 'accounts:farmer_dashboard' %}" {% if request.resolver_match.url_name == 'farmer_dashboard' %}class="active"{% endif %}>My Dashboard</a>
+        <span class="soon">My Reservations</span>
+        <span class="soon">My Contributions</span>
+        <span class="soon">My QR ID</span>
+      {% endif %}
+      <a href="{% url 'accounts:profile' %}" {% if request.resolver_match.url_name == 'profile' or request.resolver_match.url_name == 'profile_edit' %}class="active"{% endif %}>My Profile</a>
+    </nav>
+  </aside>
+  <section class="panel">{% block panel %}{% endblock %}</section>
+</div>
+{% endblock %}

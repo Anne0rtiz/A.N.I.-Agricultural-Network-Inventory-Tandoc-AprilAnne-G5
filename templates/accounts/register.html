@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% block title %}Register{% endblock %}
+{% block content %}
+<section class="container narrow-lg">
+  <div class="card">
+    <h1>Create your account</h1>
+    <p class="muted">Cooperative Admins set up a new cooperative. Farmers join an existing one with its join code.</p>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      {{ form.non_field_errors }}
+
+      <div class="field">
+        <label>{{ form.role.label }}</label>
+        <div class="role-cards">
+          {% for radio in form.role %}
+            <label class="role-card">
+              {{ radio.tag }}
+              <span>
+                <strong>{{ radio.choice_label }}</strong>
+                <small>
+                  {% if radio.data.value == "admin" %}Create and manage a cooperative{% else %}Join your cooperative{% endif %}
+                </small>
+              </span>
+            </label>
+          {% endfor %}
+        </div>
+        {% for error in form.role.errors %}<p class="error-text">{{ error }}</p>{% endfor %}
+      </div>
+
+      <div id="admin-fields" class="role-fields">
+        {% include "accounts/_field.html" with field=form.cooperative_name %}
+        {% include "accounts/_field.html" with field=form.cooperative_location %}
+      </div>
+      <div id="farmer-fields" class="role-fields">
+        {% include "accounts/_field.html" with field=form.join_code %}
+      </div>
+
+      <div class="grid-2 tight">
+        {% include "accounts/_field.html" with field=form.first_name %}
+        {% include "accounts/_field.html" with field=form.last_name %}
+      </div>
+      {% include "accounts/_field.html" with field=form.username %}
+      {% include "accounts/_field.html" with field=form.email %}
+      {% include "accounts/_field.html" with field=form.contact_number %}
+      {% include "accounts/_field.html" with field=form.password1 %}
+      {% include "accounts/_field.html" with field=form.password2 %}
+
+      <button type="submit" class="btn btn-primary btn-block">Create account</button>
+    </form>
+    <p class="muted center top-gap">Already registered? <a href="{% url 'accounts:login' %}">Log in</a></p>
+  </div>
+</section>
+
+<script>
+  (function () {
+    var radios = document.querySelectorAll('input[name="role"]');
+    var adminBox = document.getElementById('admin-fields');
+    var farmerBox = document.getElementById('farmer-fields');
+    function sync() {
+      var checked = document.querySelector('input[name="role"]:checked');
+      var value = checked ? checked.value : 'farmer';
+      adminBox.hidden = value !== 'admin';
+      farmerBox.hidden = value !== 'farmer';
+    }
+    radios.forEach(function (r) { r.addEventListener('change', sync); });
+    sync();
+  })();
+</script>
+{% endblock %}

@@ -7,7 +7,7 @@
       {% if user.is_coop_admin %}
         <a href="{% url 'accounts:admin_dashboard' %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}class="active"{% endif %}>Overview</a>
         <span class="soon">Proxy Operations Hub</span>
-        <span class="soon">Machinery Schedule</span>
+        <a href="{% url 'machinery:machine_list' %}" {% if request.resolver_match.namespace == 'machinery' and 'machine' in request.resolver_match.url_name %}class="active"{% endif %}>Machinery</a>
         <span class="soon">QR Logging</span>
         <span class="soon">Yield Ledger</span>
         <span class="soon">SMS Alerts</span>

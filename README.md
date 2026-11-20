@@ -132,4 +132,4 @@ python manage.py test --settings=config.settings_test    # runs on in-memory SQL
 ## Git workflow
 
 `main` (stable) ← `develop` (integration) ← `feature/<name>` branches, merged through Pull Requests.
-Feature branches: `feature/machinery-management`, `feature/machinery-reservation`, `feature/qr-proxy-logging`.
+Feature branches: feature/machinery-management, feature/qr-proxy-logging.

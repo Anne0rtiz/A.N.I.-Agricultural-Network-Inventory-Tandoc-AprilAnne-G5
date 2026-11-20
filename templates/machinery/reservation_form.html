@@ -1,0 +1,27 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}{% if is_edit %}Edit reservation{% else %}Reserve a machine{% endif %}{% endblock %}
+{% block panel %}
+<h1>{% if is_edit %}Edit reservation{% else %}Reserve a machine{% endif %}</h1>
+<p class="muted">Your request is sent to your Cooperative Admin for approval.</p>
+<div class="card">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}
+      <div class="alert alert-error">{{ form.non_field_errors|join:" " }}</div>
+    {% endif %}
+    {% include "accounts/_field.html" with field=form.machine %}
+    <div class="field-row">
+      {% include "accounts/_field.html" with field=form.date %}
+      {% include "accounts/_field.html" with field=form.start_time %}
+      {% include "accounts/_field.html" with field=form.end_time %}
+    </div>
+    <div class="top-gap"></div>
+    {% include "accounts/_field.html" with field=form.field_location %}
+    {% include "accounts/_field.html" with field=form.purpose %}
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">{% if is_edit %}Save changes{% else %}Submit request{% endif %}</button>
+      <a class="btn btn-ghost" href="{% url 'machinery:my_reservations' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

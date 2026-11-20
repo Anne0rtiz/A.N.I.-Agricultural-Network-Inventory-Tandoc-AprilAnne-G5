@@ -1,0 +1,49 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}Reservations{% endblock %}
+{% block panel %}
+<h1>Machinery Reservations</h1>
+<p class="muted">Review requests from farmers in {{ user.cooperative.name|default:"your cooperative" }}.</p>
+<div class="filters">
+  {% for value, label in filters %}
+    <a href="?status={{ value }}" {% if value == selected %}class="active"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</div>
+<div class="card">
+  {% if reservations %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Farmer</th><th>Machine</th><th>Date &amp; time</th><th>Status</th><th>Action</th></tr></thead>
+      <tbody>
+        {% for r in reservations %}
+        <tr>
+          <td>{{ r.farmer.display_name }}<div class="muted small-text">{{ r.farmer.farmer_code }}</div></td>
+          <td>{{ r.machine.name }}</td>
+          <td>{{ r.date|date:"M d, Y" }}<div class="muted small-text">{{ r.start_time|time:"g:i A" }} – {{ r.end_time|time:"g:i A" }}</div></td>
+          <td><span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span></td>
+          <td>
+            <a class="btn btn-ghost btn-sm" href="{% url 'machinery:reservation_detail' r.pk %}">Details</a>
+            {% if r.is_pending %}
+              <form method="post" action="{% url 'machinery:reservation_review' r.pk %}" class="review-form">
+                {% csrf_token %}
+                <input type="text" name="remarks" maxlength="300" placeholder="Remarks (required to reject)">
+                <div class="row-actions" style="justify-content:flex-start">
+                  <button type="submit" name="decision" value="approve" class="btn btn-approve btn-sm">Approve</button>
+                  <button type="submit" name="decision" value="reject" class="btn btn-ghost btn-sm btn-danger">Reject</button>
+                </div>
+              </form>
+            {% elif r.status == "approved" %}
+              <form method="post" action="{% url 'machinery:reservation_complete' r.pk %}" class="inline-form">
+                {% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm">Mark completed</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="muted">No reservations{% if selected %} with this status{% endif %}.</p>
+  {% endif %}
+</div>
+{% endblock %}

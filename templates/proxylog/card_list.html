@@ -1,0 +1,12 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}QR ID cards{% endblock %}
+{% block panel %}
+<h1>Farmer QR ID Cards</h1>
+<p class="muted">Print a card for each farmer. Cards carry the Farmer ID as a QR code.</p>
+<div class="card">
+{% if farmers %}<table class="table"><thead><tr><th>Farmer ID</th><th>Name</th><th></th></tr></thead><tbody>
+  {% for f in farmers %}<tr><td>{{ f.farmer_code }}</td><td>{{ f.display_name }}</td>
+  <td class="row-actions"><a class="btn btn-ghost btn-sm" href="{% url 'proxylog:card_print' f.farmer_code %}">View / print card</a></td></tr>{% endfor %}
+</tbody></table>{% else %}<p class="muted">No farmers have joined yet.</p>{% endif %}
+</div>
+{% endblock %}

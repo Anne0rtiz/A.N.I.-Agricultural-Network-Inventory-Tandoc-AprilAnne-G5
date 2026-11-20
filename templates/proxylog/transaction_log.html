@@ -1,0 +1,47 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}Transaction log{% endblock %}
+{% block panel %}
+<h1>Transaction Log</h1>
+<p class="muted">Every rental and crop drop-off logged for your cooperative.</p>
+<form method="get" class="filters">
+  <a href="?q={{ q|urlencode }}" {% if not kind %}class="active"{% endif %}>All</a>
+  <a href="?type=deposits&q={{ q|urlencode }}" {% if kind == "deposits" %}class="active"{% endif %}>Crop drop-offs</a>
+  <a href="?type=rentals&q={{ q|urlencode }}" {% if kind == "rentals" %}class="active"{% endif %}>Equipment rentals</a>
+  <input type="hidden" name="type" value="{{ kind }}">
+  <input type="text" name="q" value="{{ q }}" placeholder="Search farmer name or ID" class="search-box">
+  <button class="btn btn-ghost btn-sm" type="submit">Search</button>
+</form>
+
+{% if yields %}
+<div class="card"><h3>Yield totals</h3>
+  <ul class="mini-list">{% for crop, total in yields %}<li><span>{{ crop }}</span><strong>{{ total }} kg</strong></li>{% endfor %}</ul></div>
+{% endif %}
+
+{% if kind != "rentals" %}
+<div class="card"><h3>Crop drop-offs</h3>
+{% if deposits %}<div class="table-wrap"><table class="table">
+  <thead><tr><th>Date</th><th>Farmer</th><th>Crop</th><th>Weight</th><th>Grade</th><th></th></tr></thead><tbody>
+  {% for d in deposits %}<tr><td>{{ d.deposited_at|date:"M d, Y g:i A" }}</td>
+    <td>{{ d.farmer.display_name }}<div class="muted small-text">{{ d.farmer.farmer_code }}</div></td>
+    <td>{{ d.get_crop_type_display }}</td><td>{{ d.weight_kg }} kg</td><td>{{ d.grade }}</td>
+    <td class="row-actions"><a class="btn btn-ghost btn-sm" href="{% url 'proxylog:deposit_edit' d.pk %}">Edit</a>
+      <form method="post" action="{% url 'proxylog:deposit_delete' d.pk %}" class="inline-form" onsubmit="return confirm('Delete this entry?');">{% csrf_token %}
+      <button class="btn btn-ghost btn-sm btn-danger" type="submit">Delete</button></form></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<p class="muted">No drop-offs found.</p>{% endif %}</div>
+{% endif %}
+
+{% if kind != "deposits" %}
+<div class="card"><h3>Equipment rentals</h3>
+{% if rentals %}<div class="table-wrap"><table class="table">
+  <thead><tr><th>Started</th><th>Farmer</th><th>Machine</th><th>Status</th><th></th></tr></thead><tbody>
+  {% for r in rentals %}<tr><td>{{ r.start_at|date:"M d, Y g:i A" }}</td>
+    <td>{{ r.farmer.display_name }}<div class="muted small-text">{{ r.farmer.farmer_code }}</div></td>
+    <td>{{ r.machine.name }}</td>
+    <td><span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span>{% if r.returned_at %}<div class="muted small-text">{{ r.hours_used }} hrs</div>{% endif %}</td>
+    <td class="row-actions">
+      {% if r.is_active %}<form method="post" action="{% url 'proxylog:rental_return' r.pk %}" class="inline-form">{% csrf_token %}<button class="btn btn-approve btn-sm" type="submit">Return</button></form>{% endif %}
+      <form method="post" action="{% url 'proxylog:rental_delete' r.pk %}" class="inline-form" onsubmit="return confirm('Delete this entry?');">{% csrf_token %}
+      <button class="btn btn-ghost btn-sm btn-danger" type="submit">Delete</button></form></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<p class="muted">No rentals found.</p>{% endif %}</div>
+{% endif %}
+{% endblock %}

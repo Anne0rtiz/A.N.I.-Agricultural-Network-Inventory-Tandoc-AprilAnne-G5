@@ -3,8 +3,6 @@
 IT317 – G5 · IM2 Project
 Stack: Django (templates) + PostgreSQL / Supabase.
 
-**Progress:** Phase 1 – Account feature ✅ · Phase 2 – Core feature: **QR-Based Proxy Logging (equipment rentals & crop drop-offs)** ✅
-
 ## Roles
 
 | Role | How they sign up | Lands on |

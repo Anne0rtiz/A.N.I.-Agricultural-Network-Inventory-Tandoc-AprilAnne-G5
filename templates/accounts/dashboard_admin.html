@@ -36,7 +36,20 @@
 {% endif %}
 
 <div class="grid-3">
-  <div class="card placeholder"><h3>Machinery availability</h3></div>
+  <div class="card">
+    <h3>Machinery availability</h3>
+    {% if machines %}
+      <ul class="mini-list">
+        {% for m in machines|slice:":5" %}
+          <li><span>{{ m.name }}</span><span class="badge badge-{{ m.status }}">{{ m.get_status_display }}</span></li>
+        {% endfor %}
+      </ul>
+      <a class="btn btn-ghost btn-sm top-gap" href="{% url 'machinery:machine_list' %}">Manage machinery</a>
+    {% else %}
+      <p class="muted">No machines yet.</p>
+      <a class="btn btn-ghost btn-sm" href="{% url 'machinery:machine_list' %}">Add machinery</a>
+    {% endif %}
+  </div>
   <div class="card placeholder"><h3>Recent crop deposits</h3></div>
   <div class="card placeholder"><h3>Cooperative yields</h3></div>
 </div>

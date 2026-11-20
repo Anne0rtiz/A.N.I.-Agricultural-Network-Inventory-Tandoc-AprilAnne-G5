@@ -8,6 +8,7 @@ from django.views.decorators.http import require_POST
 from .decorators import role_required
 from .forms import LoginForm, ProfileForm, RegistrationForm
 from .models import User
+from machinery.models import Machine
 
 
 def home(request):
@@ -68,10 +69,14 @@ def admin_dashboard(request):
     farmers = User.objects.none()
     if cooperative is not None:
         farmers = cooperative.members.filter(role=User.Role.FARMER)
+    machines = Machine.objects.none()
+    if cooperative is not None:
+        machines = cooperative.machines.all()
     context = {
         "cooperative": cooperative,
         "farmer_count": farmers.count(),
         "recent_farmers": farmers.order_by("-date_joined")[:5],
+        "machines": machines,
     }
     return render(request, "accounts/dashboard_admin.html", context)
 

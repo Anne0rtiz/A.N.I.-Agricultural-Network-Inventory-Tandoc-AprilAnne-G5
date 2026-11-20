@@ -25,7 +25,17 @@
     <div class="actions"><a class="btn btn-primary btn-sm" href="{% url 'machinery:reservation_create' %}">Reserve</a>
       <a class="btn btn-ghost btn-sm" href="{% url 'machinery:my_reservations' %}">View all</a></div>
   </div>
-  <div class="card placeholder"><h3>My crop contributions</h3></div>
-  <div class="card placeholder"><h3>My QR ID card</h3></div>
+  <div class="card">
+    <h3>My crop contributions</h3>
+    <p class="muted">Total deposited: <strong>{{ my_total_kg }} kg</strong></p>
+    {% if my_deposits %}<ul class="mini-list">{% for d in my_deposits %}
+      <li><span>{{ d.get_crop_type_display }} · {{ d.deposited_at|date:"M d" }}</span><strong>{{ d.weight_kg }} kg</strong></li>{% endfor %}</ul>{% endif %}
+    <a class="btn btn-ghost btn-sm top-gap" href="{% url 'proxylog:my_contributions' %}">View all</a>
+  </div>
+  <div class="card">
+    <h3>My QR ID card</h3>
+    <p class="muted">Show your card at the hub so the admin can log for you.</p>
+    <a class="btn btn-primary btn-sm" href="{% url 'proxylog:my_qr' %}">View / print card</a>
+  </div>
 </div>
 {% endblock %}

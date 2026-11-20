@@ -1,0 +1,14 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}My contributions{% endblock %}
+{% block panel %}
+<h1>My Contributions</h1>
+<p class="muted">Crop drop-offs and equipment rentals your Cooperative Admin logged for you. Total deposited: <strong>{{ total_kg }} kg</strong>.</p>
+<div class="card"><h3>Crop drop-offs</h3>
+{% if deposits %}<div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Crop</th><th>Weight</th><th>Grade</th></tr></thead><tbody>
+  {% for d in deposits %}<tr><td>{{ d.deposited_at|date:"M d, Y" }}</td><td>{{ d.get_crop_type_display }}</td><td>{{ d.weight_kg }} kg</td><td>{{ d.grade }}</td></tr>{% endfor %}
+</tbody></table></div>{% else %}<p class="muted">No drop-offs recorded yet.</p>{% endif %}</div>
+<div class="card"><h3>Equipment rentals</h3>
+{% if rentals %}<div class="table-wrap"><table class="table"><thead><tr><th>Date</th><th>Machine</th><th>Status</th></tr></thead><tbody>
+  {% for r in rentals %}<tr><td>{{ r.start_at|date:"M d, Y" }}</td><td>{{ r.machine.name }}</td><td><span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span></td></tr>{% endfor %}
+</tbody></table></div>{% else %}<p class="muted">No rentals recorded yet.</p>{% endif %}</div>
+{% endblock %}

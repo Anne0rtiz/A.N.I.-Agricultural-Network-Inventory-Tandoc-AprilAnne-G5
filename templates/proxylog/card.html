@@ -1,0 +1,19 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}QR ID card{% endblock %}
+{% block panel %}
+<div class="row-between no-print"><h1>{% if is_admin_view %}QR ID card{% else %}My QR ID{% endif %}</h1>
+  <div class="actions" style="margin:0">
+    {% if is_admin_view %}<a class="btn btn-ghost" href="{% url 'proxylog:card_list' %}">Back</a>{% endif %}
+    <button class="btn btn-primary" onclick="window.print()">Print card</button></div></div>
+<p class="muted no-print">Show this card at the cooperative hub so the admin can log your rentals and harvest drop-offs.</p>
+<div class="id-card">
+  <div class="id-head"><span class="brand-mark">A.N.I.</span><span>{{ farmer.cooperative.name }}</span></div>
+  <div class="id-body">
+    {% if qr %}<img src="{{ qr }}" alt="QR code for {{ farmer.farmer_code }}" class="id-qr">
+    {% else %}<div class="id-qr id-qr-missing">QR unavailable<br><small>install requirements</small></div>{% endif %}
+    <div><strong class="id-name">{{ farmer.display_name }}</strong>
+      <div class="id-code">{{ farmer.farmer_code }}</div>
+      <div class="muted small-text">{{ farmer.contact_number }}</div></div>
+  </div>
+</div>
+{% endblock %}

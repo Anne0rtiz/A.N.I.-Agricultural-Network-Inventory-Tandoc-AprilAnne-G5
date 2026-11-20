@@ -1,0 +1,37 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}Reservation details{% endblock %}
+{% block panel %}
+<div class="row-between">
+  <h1>Reservation #{{ reservation.pk }}</h1>
+  <span class="badge badge-{{ reservation.status }}">{{ reservation.get_status_display }}</span>
+</div>
+<div class="card">
+  <dl class="details">
+    <dt>Machine</dt><dd>{{ reservation.machine.name }} ({{ reservation.machine.get_machine_type_display }})</dd>
+    {% if user.is_coop_admin %}<dt>Farmer</dt><dd>{{ reservation.farmer.display_name }} · {{ reservation.farmer.farmer_code }}</dd>{% endif %}
+    <dt>Date</dt><dd>{{ reservation.date|date:"l, F d, Y" }}</dd>
+    <dt>Time</dt><dd>{{ reservation.start_time|time:"g:i A" }} – {{ reservation.end_time|time:"g:i A" }} ({{ reservation.duration_hours }} hrs)</dd>
+    <dt>Field location</dt><dd>{{ reservation.field_location }}</dd>
+    <dt>Purpose</dt><dd>{{ reservation.purpose|linebreaksbr }}</dd>
+    <dt>Estimated cost</dt><dd>₱{{ reservation.estimated_cost }} <span class="muted small-text">(₱{{ reservation.machine.hourly_rate }}/hr)</span></dd>
+    <dt>Requested</dt><dd>{{ reservation.created_at|date:"M d, Y g:i A" }}</dd>
+    {% if reservation.reviewed_at %}
+      <dt>Reviewed</dt><dd>{{ reservation.reviewed_at|date:"M d, Y g:i A" }}{% if reservation.reviewed_by %} by {{ reservation.reviewed_by.display_name }}{% endif %}</dd>
+    {% endif %}
+    {% if reservation.admin_remarks %}<dt>Admin remarks</dt><dd>{{ reservation.admin_remarks }}</dd>{% endif %}
+  </dl>
+  <div class="actions">
+    {% if user.is_coop_admin %}
+      <a class="btn btn-ghost" href="{% url 'machinery:reservation_manage' %}">Back to reservations</a>
+    {% else %}
+      <a class="btn btn-ghost" href="{% url 'machinery:my_reservations' %}">Back</a>
+      {% if reservation.is_editable %}<a class="btn btn-primary" href="{% url 'machinery:reservation_edit' reservation.pk %}">Edit</a>{% endif %}
+      {% if reservation.is_cancellable %}
+        <form method="post" action="{% url 'machinery:reservation_cancel' reservation.pk %}" class="inline-form" onsubmit="return confirm('Cancel this reservation?');">
+          {% csrf_token %}<button type="submit" class="btn btn-ghost btn-danger">Cancel reservation</button>
+        </form>
+      {% endif %}
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

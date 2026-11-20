@@ -1,0 +1,51 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}My reservations{% endblock %}
+{% block panel %}
+<div class="row-between">
+  <div>
+    <h1>My Reservations</h1>
+    <p class="muted">Your machinery requests and their status.</p>
+  </div>
+  <a class="btn btn-primary" href="{% url 'machinery:reservation_create' %}">+ New reservation</a>
+</div>
+<div class="filters">
+  {% for value, label in filters %}
+    <a href="?status={{ value }}" {% if value == selected %}class="active"{% endif %}>{{ label }}</a>
+  {% endfor %}
+</div>
+<div class="card">
+  {% if reservations %}
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Machine</th><th>Date &amp; time</th><th>Est. cost</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for r in reservations %}
+        <tr>
+          <td><strong>{{ r.machine.name }}</strong></td>
+          <td>{{ r.date|date:"M d, Y" }}<div class="muted small-text">{{ r.start_time|time:"g:i A" }} – {{ r.end_time|time:"g:i A" }}</div></td>
+          <td>₱{{ r.estimated_cost }}</td>
+          <td><span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span></td>
+          <td class="row-actions">
+            <a class="btn btn-ghost btn-sm" href="{% url 'machinery:reservation_detail' r.pk %}">View</a>
+            {% if r.is_editable %}<a class="btn btn-ghost btn-sm" href="{% url 'machinery:reservation_edit' r.pk %}">Edit</a>{% endif %}
+            {% if r.is_cancellable %}
+              <form method="post" action="{% url 'machinery:reservation_cancel' r.pk %}" class="inline-form" onsubmit="return confirm('Cancel this reservation?');">
+                {% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm btn-danger">Cancel</button>
+              </form>
+            {% endif %}
+            {% if r.is_deletable %}
+              <form method="post" action="{% url 'machinery:reservation_delete' r.pk %}" class="inline-form" onsubmit="return confirm('Delete this record permanently?');">
+                {% csrf_token %}<button type="submit" class="btn btn-ghost btn-sm btn-danger">Delete</button>
+              </form>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% else %}
+    <p class="muted">No reservations{% if selected %} with this status{% endif %}. <a href="{% url 'machinery:machine_catalog' %}">Browse machinery</a> to book one.</p>
+  {% endif %}
+</div>
+{% endblock %}

@@ -12,7 +12,19 @@
 </div>
 
 <div class="grid-3">
-  <div class="card placeholder"><h3>My tractor reservations</h3></div>
+  <div class="card">
+    <h3>My machinery reservations</h3>
+    {% if upcoming_reservations %}
+      <ul class="mini-list">
+        {% for r in upcoming_reservations %}
+          <li><span>{{ r.machine.name }}<br><span class="muted small-text">{{ r.date|date:"M d" }}, {{ r.start_time|time:"g:i A" }}</span></span>
+              <span class="badge badge-{{ r.status }}">{{ r.get_status_display }}</span></li>
+        {% endfor %}
+      </ul>
+    {% else %}<p class="muted">No upcoming reservations.</p>{% endif %}
+    <div class="actions"><a class="btn btn-primary btn-sm" href="{% url 'machinery:reservation_create' %}">Reserve</a>
+      <a class="btn btn-ghost btn-sm" href="{% url 'machinery:my_reservations' %}">View all</a></div>
+  </div>
   <div class="card placeholder"><h3>My crop contributions</h3></div>
   <div class="card placeholder"><h3>My QR ID card</h3></div>
 </div>

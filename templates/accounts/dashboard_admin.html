@@ -35,6 +35,18 @@
   <div class="alert alert-warning">Your account isn't linked to a cooperative yet.</div>
 {% endif %}
 
+<div class="card">
+  <div class="row-between"><h3>Pending machinery requests</h3><a class="btn btn-ghost btn-sm" href="{% url 'machinery:reservation_manage' %}">Review all</a></div>
+  {% if pending_reservations %}
+    <ul class="mini-list">
+      {% for r in pending_reservations|slice:":5" %}
+        <li><span>{{ r.farmer.display_name }} · {{ r.machine.name }}<br><span class="muted small-text">{{ r.date|date:"M d" }}, {{ r.start_time|time:"g:i A" }}</span></span>
+            <a class="btn btn-ghost btn-sm" href="{% url 'machinery:reservation_detail' r.pk %}">Open</a></li>
+      {% endfor %}
+    </ul>
+  {% else %}<p class="muted">No requests waiting for review.</p>{% endif %}
+</div>
+
 <div class="grid-3">
   <div class="card">
     <h3>Machinery availability</h3>

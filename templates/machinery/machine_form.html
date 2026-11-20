@@ -1,0 +1,16 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}{% if is_edit %}Edit machine{% else %}Add machine{% endif %}{% endblock %}
+{% block panel %}
+<h1>{% if is_edit %}Edit {{ machine.name }}{% else %}Add a machine{% endif %}</h1>
+<p class="muted">Machines marked “Under maintenance” can't be reserved.</p>
+<div class="card">
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}{% include "accounts/_field.html" %}{% endfor %}
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">{% if is_edit %}Save changes{% else %}Add machine{% endif %}</button>
+      <a class="btn btn-ghost" href="{% url 'machinery:machine_list' %}">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

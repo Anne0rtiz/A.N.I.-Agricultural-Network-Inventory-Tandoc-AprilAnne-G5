@@ -3,11 +3,15 @@ from django.contrib.auth import logout
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import redirect, render
+from django.utils import timezone
 from django.views.decorators.http import require_POST
 
 from .decorators import role_required
 from .forms import LoginForm, ProfileForm, RegistrationForm
 from .models import User
+from django.db.models import Sum
+from machinery.models import Machine, Reservation
+from proxylog.models import CropDeposit
 
 
 def home(request):
@@ -68,20 +72,55 @@ def admin_dashboard(request):
     farmers = User.objects.none()
     if cooperative is not None:
         farmers = cooperative.members.filter(role=User.Role.FARMER)
+    machines = Machine.objects.none()
+    if cooperative is not None:
+        machines = cooperative.machines.all()
+    pending_reservations = Reservation.objects.none()
+    if cooperative is not None:
+        pending_reservations = Reservation.objects.filter(
+            machine__cooperative=cooperative, status=Reservation.Status.PENDING
+        ).select_related("machine", "farmer").order_by("date", "start_time")
+    recent_deposits, yield_totals = CropDeposit.objects.none(), []
+    if cooperative is not None:
+        deposits = CropDeposit.objects.filter(cooperative=cooperative)
+        recent_deposits = deposits.select_related("farmer")[:5]
+        labels = dict(CropDeposit.CropType.choices)
+        yield_totals = [
+            (labels[row["crop_type"]], row["total"])
+            for row in deposits.values("crop_type").annotate(total=Sum("weight_kg")).order_by("-total")
+        ]
     context = {
         "cooperative": cooperative,
         "farmer_count": farmers.count(),
         "recent_farmers": farmers.order_by("-date_joined")[:5],
+        "machines": machines,
+        "pending_reservations": pending_reservations,
+        "recent_deposits": recent_deposits,
+        "yield_totals": yield_totals,
     }
     return render(request, "accounts/dashboard_admin.html", context)
 
 
 @role_required(User.Role.FARMER)
 def farmer_dashboard(request):
+    upcoming = (
+        Reservation.objects.filter(
+            farmer=request.user,
+            date__gte=timezone.localdate(),
+            status__in=[Reservation.Status.PENDING, Reservation.Status.APPROVED],
+        )
+        .select_related("machine")
+        .order_by("date", "start_time")[:5]
+    )
     return render(
         request,
         "accounts/dashboard_farmer.html",
-        {"cooperative": request.user.cooperative},
+        {
+            "cooperative": request.user.cooperative,
+            "upcoming_reservations": upcoming,
+            "my_deposits": request.user.crop_deposits.all()[:3],
+            "my_total_kg": request.user.crop_deposits.aggregate(t=Sum("weight_kg"))["t"] or 0,
+        },
     )
 
 

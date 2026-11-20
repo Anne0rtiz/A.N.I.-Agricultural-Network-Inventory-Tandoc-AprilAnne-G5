@@ -1,0 +1,49 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}QR Logging{% endblock %}
+{% block panel %}
+<h1>QR Logging</h1>
+<p class="muted">Scan a farmer's printed QR ID card to log an equipment rental or a crop drop-off.</p>
+<div class="card">
+  <form method="post" novalidate id="scan-form">
+    {% csrf_token %}
+    {% include "accounts/_field.html" with field=form.farmer_code %}
+    <div class="actions">
+      <button type="submit" class="btn btn-primary">Find farmer</button>
+      <button type="button" class="btn btn-ghost" id="cam-btn" hidden>Scan with camera</button>
+      <a class="btn btn-ghost" href="{% url 'proxylog:card_list' %}">Print QR ID cards</a>
+    </div>
+  </form>
+  <video id="cam" class="scan-video" playsinline hidden></video>
+  <p class="help">A USB / handheld QR scanner works too: click the box above and scan — it types the ID and presses Enter.</p>
+</div>
+<div class="card">
+  <h3>Latest crop drop-offs</h3>
+  {% if recent %}
+  <ul class="mini-list">{% for d in recent %}
+    <li><span>{{ d.farmer.display_name }} · {{ d.get_crop_type_display }}</span><strong>{{ d.weight_kg }} kg</strong></li>
+  {% endfor %}</ul>
+  {% else %}<p class="muted">No drop-offs logged yet.</p>{% endif %}
+</div>
+<script>
+(function () {
+  var btn = document.getElementById('cam-btn'), video = document.getElementById('cam');
+  if (!btn || !('BarcodeDetector' in window) || !navigator.mediaDevices) return;
+  btn.hidden = false;
+  btn.addEventListener('click', function () {
+    var detector = new BarcodeDetector({formats: ['qr_code']});
+    navigator.mediaDevices.getUserMedia({video: {facingMode: 'environment'}}).then(function (stream) {
+      video.srcObject = stream; video.hidden = false; video.play();
+      (function tick() {
+        detector.detect(video).then(function (codes) {
+          if (codes.length) {
+            stream.getTracks().forEach(function (t) { t.stop(); });
+            document.getElementById('id_farmer_code').value = codes[0].rawValue;
+            document.getElementById('scan-form').submit();
+          } else { requestAnimationFrame(tick); }
+        }).catch(function () { requestAnimationFrame(tick); });
+      })();
+    }).catch(function () { alert('Camera not available. Type the Farmer ID instead.'); });
+  });
+})();
+</script>
+{% endblock %}

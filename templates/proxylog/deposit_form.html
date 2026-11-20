@@ -1,0 +1,13 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}Edit drop-off{% endblock %}
+{% block panel %}
+<h1>Edit crop drop-off</h1>
+<p class="muted">{{ deposit.farmer.display_name }} · {{ deposit.farmer.farmer_code }} · {{ deposit.deposited_at|date:"M d, Y g:i A" }}</p>
+<div class="card">
+  <form method="post" novalidate>{% csrf_token %}
+    {% for field in form %}{% include "accounts/_field.html" %}{% endfor %}
+    <div class="actions"><button class="btn btn-primary" type="submit">Save changes</button>
+      <a class="btn btn-ghost" href="{% url 'proxylog:transaction_log' %}">Cancel</a></div>
+  </form>
+</div>
+{% endblock %}

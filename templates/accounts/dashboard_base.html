@@ -7,15 +7,19 @@
       {% if user.is_coop_admin %}
         <a href="{% url 'accounts:admin_dashboard' %}" {% if request.resolver_match.url_name == 'admin_dashboard' %}class="active"{% endif %}>Overview</a>
         <span class="soon">Proxy Operations Hub</span>
-        <span class="soon">Machinery Schedule</span>
-        <span class="soon">QR Logging</span>
+        <a href="{% url 'machinery:machine_list' %}" {% if request.resolver_match.url_name in 'machine_list machine_create machine_edit' %}class="active"{% endif %}>Machinery</a>
+        <a href="{% url 'machinery:reservation_manage' %}" {% if request.resolver_match.url_name in 'reservation_manage reservation_detail' %}class="active"{% endif %}>Reservations{% if pending_count %} <span class="badge badge-pending">{{ pending_count }}</span>{% endif %}</a>
+        <a href="{% url 'proxylog:scan' %}" {% if request.resolver_match.url_name in 'scan farmer_workspace deposit_edit' %}class="active"{% endif %}>QR Logging</a>
+        <a href="{% url 'proxylog:transaction_log' %}" {% if request.resolver_match.url_name == 'transaction_log' %}class="active"{% endif %}>Transaction Log</a>
+        <a href="{% url 'proxylog:card_list' %}" {% if request.resolver_match.url_name in 'card_list card_print' %}class="active"{% endif %}>QR ID Cards</a>
         <span class="soon">Yield Ledger</span>
         <span class="soon">SMS Alerts</span>
       {% else %}
         <a href="{% url 'accounts:farmer_dashboard' %}" {% if request.resolver_match.url_name == 'farmer_dashboard' %}class="active"{% endif %}>My Dashboard</a>
-        <span class="soon">My Reservations</span>
-        <span class="soon">My Contributions</span>
-        <span class="soon">My QR ID</span>
+        <a href="{% url 'machinery:machine_catalog' %}" {% if request.resolver_match.url_name == 'machine_catalog' %}class="active"{% endif %}>Browse Machinery</a>
+        <a href="{% url 'machinery:my_reservations' %}" {% if request.resolver_match.url_name in 'my_reservations reservation_create reservation_edit reservation_detail' %}class="active"{% endif %}>My Reservations</a>
+        <a href="{% url 'proxylog:my_contributions' %}" {% if request.resolver_match.url_name == 'my_contributions' %}class="active"{% endif %}>My Contributions</a>
+        <a href="{% url 'proxylog:my_qr' %}" {% if request.resolver_match.url_name == 'my_qr' %}class="active"{% endif %}>My QR ID</a>
       {% endif %}
       <a href="{% url 'accounts:profile' %}" {% if request.resolver_match.url_name == 'profile' or request.resolver_match.url_name == 'profile_edit' %}class="active"{% endif %}>My Profile</a>
     </nav>

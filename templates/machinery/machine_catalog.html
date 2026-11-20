@@ -1,0 +1,27 @@
+{% extends "accounts/dashboard_base.html" %}
+{% block title %}Browse machinery{% endblock %}
+{% block panel %}
+<h1>Browse Machinery</h1>
+<p class="muted">Equipment owned by {{ user.cooperative.name|default:"your cooperative" }}.</p>
+{% if machines %}
+<div class="machine-grid">
+  {% for m in machines %}
+  <div class="card">
+    <div class="row-between">
+      <h3>{{ m.name }}</h3>
+      <span class="badge badge-{{ m.status }}">{{ m.get_status_display }}</span>
+    </div>
+    <p class="muted small-text">{{ m.get_machine_type_display }} · ₱{{ m.hourly_rate }} per hour</p>
+    {% if m.description %}<p>{{ m.description }}</p>{% endif %}
+    {% if m.is_available %}
+      <a class="btn btn-primary btn-sm" href="{% url 'machinery:reservation_create' %}?machine={{ m.pk }}">Reserve</a>
+    {% else %}
+      <span class="muted small-text">Not available for booking right now.</span>
+    {% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card"><p class="muted">Your cooperative hasn't added any machinery yet.</p></div>
+{% endif %}
+{% endblock %}

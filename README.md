@@ -93,7 +93,7 @@ Create `.env` in the project root (never commit it):
 
 ```
 DJANGO_SECRET_KEY=change-me
-DJANGO_DEBUG=True
+DJANGO_DEBUG=True        # defaults to False when omitted; keep False in production
 DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
 DB_NAME=postgres
 DB_USER=<supabase user>
@@ -125,9 +125,15 @@ Open http://127.0.0.1:8000/.
 
 ```bash
 python manage.py test --settings=config.settings_test    # runs on in-memory SQLite, no DB needed
+python manage.py test                                    # same suite against your PostgreSQL/Supabase DB
+python manage.py test proxylog --settings=config.settings_test   # only the core feature (QR proxy logging)
 ```
+
+Core-feature tests live in `proxylog/tests/` (`test_proxylog.py`, `test_hardening.py`) and `machinery/tests/`.
+See `.env.example` for the required environment variables.
 
 ## Git workflow
 
-`main` (stable) ← `develop` (integration) ← `feature/<name>` branches, merged through Pull Requests.
-Feature branches: feature/machinery-management, feature/qr-proxy-logging.
+`main` (stable) ← `develop` (integration) ← work branches, merged through Pull Requests.
+PD2: feature/machinery-management, feature/machinery-reservation, feature/qr-proxy-logging.
+PD3: `fix/iss-03-rental-race`, `hardening/error-pages-and-settings`, `test/core-feature-tests`.

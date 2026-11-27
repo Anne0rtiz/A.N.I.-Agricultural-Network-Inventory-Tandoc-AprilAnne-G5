@@ -47,6 +47,11 @@ class CropDeposit(models.Model):
 
     class Meta:
         ordering = ["-deposited_at"]
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(weight_kg__gt=0), name="deposit_weight_positive"
+            ),
+        ]
 
     def __str__(self):
         return f"{self.farmer.farmer_code} · {self.get_crop_type_display()} {self.weight_kg} kg"
@@ -92,6 +97,18 @@ class EquipmentRental(models.Model):
 
     class Meta:
         ordering = ["-start_at"]
+        constraints = [
+            # A machine can be out on only one active rental at a time (fixes PD2 ISS-03).
+            models.UniqueConstraint(
+                fields=["machine"],
+                condition=models.Q(status="active"),
+                name="one_active_rental_per_machine",
+            ),
+            models.CheckConstraint(
+                condition=models.Q(expected_hours__gte=Decimal("0.5"), expected_hours__lte=Decimal("12")),
+                name="rental_hours_between_0_5_and_12",
+            ),
+        ]
 
     def __str__(self):
         return f"{self.machine.name} → {self.farmer.farmer_code}"

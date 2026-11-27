@@ -13,7 +13,8 @@ def env_bool(name, default=False):
 
 
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-only-insecure-key-change-me")
-DEBUG = env_bool("DJANGO_DEBUG", True)
+# Secure by default: DEBUG is only on when DJANGO_DEBUG=True is set in .env
+DEBUG = env_bool("DJANGO_DEBUG", False)
 ALLOWED_HOSTS = [
     h.strip()
     for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1").split(",")
@@ -111,6 +112,8 @@ if not DEBUG:
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
+    SECURE_REFERRER_POLICY = "same-origin"
+    X_FRAME_OPTIONS = "DENY"
     CSRF_TRUSTED_ORIGINS = [
         o.strip()
         for o in os.environ.get("DJANGO_CSRF_TRUSTED_ORIGINS", "").split(",")

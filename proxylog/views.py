@@ -1,7 +1,7 @@
 from decimal import Decimal
 
 from django.contrib import messages
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.db.models import Q, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
@@ -9,7 +9,7 @@ from django.views.decorators.http import require_POST
 
 from accounts.decorators import role_required
 from accounts.models import User
-from machinery.models import Reservation
+from machinery.models import Machine, Reservation
 
 from .forms import CropDepositForm, RentalForm, ScanForm
 from .models import CropDeposit, EquipmentRental
@@ -126,14 +126,27 @@ def deposit_delete(request, pk):
 @require_POST
 def rental_create(request, code):
     farmer = _get_farmer(request.user, code)
-    form = RentalForm(request.POST, cooperative=request.user.cooperative, farmer=farmer)
-    if form.is_valid():
-        rental = form.save(commit=False)
-        rental.cooperative = request.user.cooperative
-        rental.farmer = farmer
-        rental.logged_by = request.user
-        rental.reservation = form.linked_reservation
-        rental.save()
+    form, rental = None, None
+    try:
+        with transaction.atomic():
+            # Lock the chosen machine row so two admins cannot check out the same machine at once.
+            machine_pk = request.POST.get("machine", "")
+            if machine_pk.isdigit():
+                list(Machine.objects.select_for_update().filter(
+                    pk=int(machine_pk), cooperative_id=request.user.cooperative_id))
+            form = RentalForm(request.POST, cooperative=request.user.cooperative, farmer=farmer)
+            if form.is_valid():
+                rental = form.save(commit=False)
+                rental.cooperative = request.user.cooperative
+                rental.farmer = farmer
+                rental.logged_by = request.user
+                rental.reservation = form.linked_reservation
+                rental.save()
+    except IntegrityError:
+        # Database safety net (one_active_rental_per_machine) caught a simultaneous checkout.
+        form.add_error(None, "That machine was just checked out by someone else. Refresh and try again.")
+        rental = None
+    if rental is not None:
         messages.success(request, f"{rental.machine.name} checked out to {farmer.display_name}.")
         return redirect("proxylog:farmer_workspace", code=farmer.farmer_code)
     messages.error(request, "Rental not saved. Please fix the errors below.")
